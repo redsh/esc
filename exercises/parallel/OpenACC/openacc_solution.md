@@ -193,12 +193,13 @@ Then, we can compare ```jac_solv.n001.gpu``` to see if we see any difference!
        // 2b. j loop over all j not equal to i
        
        #pragma acc loop worker reduction(+:xval)
-       for(j=0;j<ORDER;j++){
-         if(j!=i)
-         {
-         	xval += A[i*ORDER+j] * xold[j];
-         }
+       for(j=0;j<i;j++){
+         xval += A[i*ORDER+j] * xold[j];
        }
+       #pragma acc loop worker reduction(+:xval)
+       for(j=i+1;j<ORDER;j++){
+         xval += A[i*ORDER+j] * xold[j];
+         
        xnew[i]= (b[i] - xval)/A[i*ORDER+i];
      }
 ```
