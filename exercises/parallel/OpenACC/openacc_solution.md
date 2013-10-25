@@ -62,7 +62,7 @@ Each iteration of the jacobi algorithm uses A, xold and b as input and produces 
 We can therefore run the iterations on the GPU not communicating anything but the convergence residual conv to the host memory. We can instruct the PGI OpenACC compiler to do so by putting the following line just above the while loop:
 
 ``` c
-#pragma omp data pcopyin(A[0:ORDER*ORDER],b[ORDER],xold[ORDER]) pcopyout(xnew[ORDER])
+#pragma omp data pcopyin(A[0:ORDER*ORDER],b[0:ORDER],xold[0:ORDER]) pcopyout(xnew[0:ORDER])
 while (conv > TOL && k<kMAX)
 {
 ...
@@ -208,11 +208,11 @@ Performance evaluation
 ====
 
 What about the performance we gained adding 3 lines of code?
-We can get a ```rough estimate``` of the single core baseline performance, compiling and executing a CPU, serial version with:
+We can get a rough estimate of the single core baseline performance, compiling and executing a CPU, serial version with:
 ``` sh
 g++ -O3 jac_solv.c frandom.c -lgomp -o jac_solv_cpu && ./jac_solv_cpu
 ```
-which gives:
+which gives (Note: pgc++ does a better job because it vectorizes loops on the CPU):
 
 ```
 Order 10000 solver, ave error = 0.048705 and 29 iterations in 3.954635 seconds
@@ -227,4 +227,5 @@ gives:
 ```
 Order 10000 solver, ave error = 0.048705 and 29 iterations in 0.751852 seconds
 ```
+
 
