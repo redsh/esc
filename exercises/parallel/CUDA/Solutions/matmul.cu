@@ -98,6 +98,8 @@ int main(void)
     CudaSafeCall( cudaMalloc(&d_b, sizeof(float)*szB) );
     CudaSafeCall( cudaMalloc(&d_c, sizeof(float)*szC) );
     
+    start_time = wtime();
+    
     CudaSafeCall( cudaMemcpy(d_a, &h_A[0], sizeof(float)*szA, cudaMemcpyHostToDevice) ); //copies vectors initialized on host to device
     CudaSafeCall( cudaMemcpy(d_b, &h_B[0], sizeof(float)*szB, cudaMemcpyHostToDevice) );
     
@@ -106,12 +108,15 @@ int main(void)
     cudaEventCreate(&start);    //just for timing purpose
     cudaEventCreate(&stop);     //just for timing purpose
     printf("\n===== CUDA, matrix mult, C(i,j) per work item, order %d ======\n",Ndim);
-
+	
+	
     // Do the multiplication COUNT times
     for (int i = 0; i < COUNT; i++)
     {
         zero_mat(Ndim, Mdim, h_C);
 
+		start_time = wtime();
+	
         dim3 grid,block;
         
         block.x = 32;
@@ -132,7 +137,10 @@ int main(void)
         
         CudaSafeCall( cudaMemcpy(&h_C[0], d_c, sizeof(float)*szC, cudaMemcpyDeviceToHost) ); //copies vector computed on device to host
         
-        results(Mdim, Ndim, Pdim, h_C, elapsed_time/1000.f);
+        run_time  = wtime() - start_time;
+        
+        results(Mdim, Ndim, Pdim, h_C, run_time);
+        printf("CUDA kernel event-based timer (does not count result memcopy): elapsed time %lf\n",elapsed_time/1000.f);
     }
     
     CudaSafeCall( cudaFree(d_a) ); //frees up memory

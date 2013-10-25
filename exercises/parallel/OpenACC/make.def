@@ -3,7 +3,7 @@
 CC          = /opt/pgi/linux86-64/2013/bin/pgc++
 CLINKER     = $(CC)
 #OPTFLAGS    =   -acc -fast -Minfo
-OPTFLAGS    =   -acc -fast
+OPTFLAGS    =   -acc -fast -Minfo -ta=nvidia,keepgpu,keepptx
 LIBS        = -lm
 PRE         = ./
 
