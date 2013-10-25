@@ -62,7 +62,7 @@ Each iteration of the jacobi algorithm uses A, xold and b as input and produces 
 We can therefore run the iterations on the GPU not communicating anything but the convergence residual conv to the host memory. We can instruct the PGI OpenACC compiler to do so by putting the following line just above the while loop:
 
 ``` c
-#pragma omp data copyin(A[0:ORDER*ORDER],b[0:ORDER],xold[0:ORDER]),copyout(xnew[0:ORDER])
+#pragma acc data copyin(A[0:ORDER*ORDER],b[0:ORDER],xold[0:ORDER]),copy(xnew[0:ORDER])
 while (conv > TOL && k<kMAX)
 {
 ...
