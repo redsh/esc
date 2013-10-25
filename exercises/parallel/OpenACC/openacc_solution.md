@@ -54,7 +54,7 @@ start_time = omp_get_wtime();
 
 ```
 
-Memory transfers
+Memory transfers and parallelization directives
 ===
 
 Each iteration of the jacobi algorithm uses A, xold and b as input and produces new xold. xnew, instead, is used to check the convergence error later in the code, when the algorithm has finished. Hence the whole while loop ```takes as input A, b xold and outputs xnew``` (and conv).

@@ -17,6 +17,7 @@
 **
 **  HISTORY: Written by Tim Mattson, October 2013
 **           Debugging and clean up by Vincenzo Innocente, October 2013
+**           Same by F Rossi, Oct 2013
 */
 // #define DEBUG 1
 #ifdef APPLE
@@ -29,11 +30,17 @@
 #include <math.h>
 #include "frandom.h"
 
+#ifdef __PGI
+#include <openacc.h>
+#endif
+
 #define ORDER   10000
 #define SEED    571
 #define TOL     0.000001
 #define TYPE    double 
 #define kMAX    100
+
+
 
 int main(int argc, char **argv)
 {
@@ -75,6 +82,13 @@ int main(int argc, char **argv)
    // 2. Iteratively update estimates of x
 
    k = 0;
+
+   #ifdef __PGI
+   acc_set_device_num(0,acc_device_nvidia);
+   #endif
+   
+   start_time = omp_get_wtime(); 
+   
    conv = (TYPE)(kMAX);  // start with a large convergence value
    while (conv > TOL && k<kMAX){
      for (i=0; i<ORDER; i++){
@@ -104,6 +118,8 @@ int main(int argc, char **argv)
 
    }
 
+   run_time = omp_get_wtime() - start_time;
+
    // test results
    error = 0.0;
    for (i=0; i<ORDER; i++){
@@ -119,7 +135,6 @@ int main(int argc, char **argv)
     }
     error = sqrt((error)/(TYPE)ORDER);
 
-   run_time = omp_get_wtime() - start_time;
 
    printf(" Order %d solver, ave error = %f and %d iterations in %lf seconds\n",
                    ORDER,error,k,run_time);
