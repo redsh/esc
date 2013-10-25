@@ -43,8 +43,11 @@ veryclean:
 	$(RM) $(EXES) $(COMM_OBJS) *.$(OBJ)
 
 .SUFFIXES:
-.SUFFIXES: .c .cpp .$(OBJ)
+.SUFFIXES: .c .cpp .cu .$(OBJ)
 
+.cu.$(OBJ):
+	$(CC) $(CFLAGS) -c $<
+	
 .c.$(OBJ):
 	$(CC) $(CFLAGS) -c $<
 
